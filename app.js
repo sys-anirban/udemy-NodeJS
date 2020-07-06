@@ -1,26 +1,21 @@
 const http = require("http");
-const routes = require("./routes");
 const express = require("express");
 const bodyParser = require("body-parser");
-const port = process.env.PORT || 3000;
+const adminRoutes = require("./routes/admin");
+const shopRoutes = require("./routes/shop");
 
+const port = process.env.PORT || 3000;
+const path = require("path");
 const app = express();
+
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use("/add", (req, res, next) => {
-  console.log("req", req.url);
-  res.send(
-    "<div><form method='POST' action='/products'><label>Products</label><input type='text' name='product' /><button type='submit'>Save</button></form></div>"
-  );
-});
-app.get("/products", (req, res, next) => {
-  console.log("req", req.body);
-  res.redirect("/checkroute");
-});
-app.use("/checkroute", (req, res, next) => {
-  res.send("<h1>checkroute</h1>");
-});
-app.use("/", (req, res, next) => {
-  res.send("<h1>Root Route</h1>");
+app.use(express.static(path.join(__dirname, "public")));
+
+app.use("/admin", adminRoutes);
+app.use(shopRoutes);
+
+app.use((req, res, next) => {
+  res.status(404).sendFile(path.join(__dirname, "views", "404.html"));
 });
 
 app.listen(port);
